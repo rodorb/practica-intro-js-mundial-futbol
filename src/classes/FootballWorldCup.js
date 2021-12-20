@@ -2,7 +2,31 @@
 export class FootBallWorldCup {
     constructor(teams) {
         this.teams = teams;
-        this.playPlayOffs([...teams]);
+        this.playOffsTeams = this.setPlayOffTeamsRandomly([...teams]);
+        console.log(this.playOffsTeams.length);
+        this.playPlayOffs([...this.playOffsTeams]);
+    }
+
+    setPlayOffTeamsRandomly(teams) {
+        const REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS = 16;
+        let playOffsTeamsAux = [];
+        try {
+            if (teams.length > REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
+                while (playOffsTeamsAux.length < REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
+                    playOffsTeamsAux = playOffsTeamsAux.concat(teams.splice(Math.ceil(Math.random() * (teams.length - 1)), 1));
+                }
+            } else if (teams.length < REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
+                console.log('THERE SHOULD BE AT LEAST 16 TEAMS');
+                return;
+            } else {
+                return teams;
+            }
+        } catch (error) {
+            console.error(error);
+            return;
+        }
+        return playOffsTeamsAux;
+
     }
 
     playPlayOffs(teams) {
@@ -103,22 +127,22 @@ export class FootBallWorldCup {
         });
     }
 
-    printWorldChampion(teams){
+    printWorldChampion(teams) {
         try {
-            if(teams.length === 1){
+            if (teams.length === 1) {
                 const WORLD_CHAMPION_NAME = teams[0].name;
                 console.log(`
 ===============================================
 ¡${WORLD_CHAMPION_NAME} campeón del mundo!
 ===============================================
                 `);
-            }else{
+            } else {
                 console.log("SOMETHING WRONG HAPPENED, AT THIS POINT ONLY ONE TEAM SHOULD REMAIN");
             }
         } catch (error) {
             console.error(error)
         }
-        
+
     }
 
 }

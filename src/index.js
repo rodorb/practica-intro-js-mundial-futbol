@@ -21,7 +21,26 @@ const WORLD_CUP_TEAMS = [
     new FootBallTeam('Portugal'),
     new FootBallTeam('Polonia'),
     new FootBallTeam('Suecia'),
-    new FootBallTeam('Finlandia')
+    new FootBallTeam('Finlandia'),
+
+
+
+    new FootBallTeam('Perú'),
+    new FootBallTeam('Zimbabwe'),
+    new FootBallTeam('Korea del Norte'),
+    new FootBallTeam('Korea del Sur'),
+    new FootBallTeam('China'),
+    new FootBallTeam('Italia'),
+    new FootBallTeam('Andorra'),
+    new FootBallTeam('Uganda'),
+    new FootBallTeam('Tanzania'),
+    new FootBallTeam('Filipinas'),
+    new FootBallTeam('Nigeria'),
+    new FootBallTeam('VietNaM'),
+    new FootBallTeam('Rusia'),
+    new FootBallTeam('Uruguay'),
+    new FootBallTeam('Bolivia'),
+    new FootBallTeam('Noruega')
 ];
 //DONE:   El programa deberá mostrar los 16 equipos participantes en la fase de eliminatorias (play off).
 console.log(`Equipos que van a participar en el playoff: ${WORLD_CUP_TEAMS.map(team => team.name)}`);
