@@ -2,6 +2,7 @@
 export class FootBallWorldCup {
     constructor(teams) {
         this.teams = teams;
+        //TODO: SEPARAR LOS MÉTODOS DEL CONSTRUCTOR, LLAMARLOS EN EL INDEX.JS
         this.playOffsTeams = this.setPlayOffTeamsRandomly([...teams]);
         console.log(`Equipos que van a participar en el playoff: ${this.playOffsTeams.map(team => team.name)}`);
         this.playPlayOffs([...this.playOffsTeams]);
