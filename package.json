@@ -1,21 +1,22 @@
 {
-  "name": "practica-intro-js-mundial-futbol",
-  "version": "1.0.0",
-  "description": "Práctica del módulo Introducción a Javascript - Simulador de Mundial de futbol",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node -r esm .\\src\\index.js  "
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rodorb/practica-intro-js-mundial-futbol.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/rodorb/practica-intro-js-mundial-futbol/issues"
-  },
-  "homepage": "https://github.com/rodorb/practica-intro-js-mundial-futbol#readme"
+    "name": "practica-intro-js-mundial-futbol",
+    "type": "module",
+    "version": "1.0.0",
+    "description": "Práctica del módulo Introducción a Javascript - Simulador de Mundial de futbol",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node -r esm .\\src\\index.js  "
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/rodorb/practica-intro-js-mundial-futbol.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/rodorb/practica-intro-js-mundial-futbol/issues"
+    },
+    "homepage": "https://github.com/rodorb/practica-intro-js-mundial-futbol#readme"
 }

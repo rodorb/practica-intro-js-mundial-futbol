@@ -22,9 +22,6 @@ const WORLD_CUP_TEAMS = [
     new FootBallTeam('Polonia'),
     new FootBallTeam('Suecia'),
     new FootBallTeam('Finlandia'),
-
-
-
     new FootBallTeam('Perú'),
     new FootBallTeam('Zimbabwe'),
     new FootBallTeam('Korea del Norte'),
@@ -43,9 +40,8 @@ const WORLD_CUP_TEAMS = [
     new FootBallTeam('Noruega')
 ];
 //DONE:   El programa deberá mostrar los 16 equipos participantes en la fase de eliminatorias (play off).
-console.log(`Equipos que van a participar en el playoff: ${WORLD_CUP_TEAMS.map(team => team.name)}`);
 const MUNDIAL = new FootBallWorldCup(WORLD_CUP_TEAMS);
-
+// console.log(`Equipos que van a participar en el playoff: ${MUNDIAL.playOffsTeams.map(team => team.name)}`);
 
 //TODO:  A continuación se deberán mostrar los resultados de los partidos en las diferentes rondas
 // (octavos de final, cuartos de final y semifinales), indicando qué equipos se clasifican para
