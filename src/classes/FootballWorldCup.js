@@ -10,7 +10,7 @@ export class FootBallWorldCup {
         try {
             if (teams.length > REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
                 while (playOffsTeamsAux.length < REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
-                    playOffsTeamsAux = playOffsTeamsAux.concat(teams.splice(Math.ceil(Math.random() * (teams.length - 1)), 1));
+                    playOffsTeamsAux = playOffsTeamsAux.concat(teams.splice(Math.floor(Math.random() * (teams.length - 1)), 1));
                 }
             } else if (teams.length < REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
                 console.log('THERE SHOULD BE AT LEAST 16 TEAMS');
@@ -72,8 +72,8 @@ export class FootBallWorldCup {
                 let FIRST_RANDOM_TEAM;
                 let SECOND_RANDOM_TEAM;
                 if (randomizeOrder) {
-                    FIRST_RANDOM_TEAM = TEAMS_CLONE.splice(Math.ceil(Math.random() * (TEAMS_CLONE.length - 1)), 1);
-                    SECOND_RANDOM_TEAM = TEAMS_CLONE.splice(Math.ceil(Math.random() * (TEAMS_CLONE.length - 1)), 1);
+                    FIRST_RANDOM_TEAM = TEAMS_CLONE.splice(Math.floor(Math.random() * (TEAMS_CLONE.length - 1)), 1);
+                    SECOND_RANDOM_TEAM = TEAMS_CLONE.splice(Math.floor(Math.random() * (TEAMS_CLONE.length - 1)), 1);
 
                 } else {
                     FIRST_RANDOM_TEAM = TEAMS_CLONE.splice(j[0], 1);
