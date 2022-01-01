@@ -1,7 +1,7 @@
 export default class League {
     constructor(name, teams, config = {}) {
         this.name = name;
-        this.setupTeams(teams);
+        this.teams = teams;
         this.setup(config);
         this.matchDaySchedule = [];
         this.summaries = [];
@@ -12,37 +12,20 @@ export default class League {
         this.config = Object.assign(defaultConfig, config);
     }
 
-    setupTeams(teams) {
-        this.teams = [];
-        for (let teamName of teams) {
-            let teamObj = this.customizeTeam(teamName);
-            // añadimos el objeto descriptivo del equipo al array de equipos
-            this.teams.push(teamObj)
-        }
-    }
-
-    customizeTeam(teamName) {
-        return {
-            name: teamName,
-            matchesWon: 0,
-            matchesDraw: 0,
-            matchesLost: 0
-        }
-    }
 
     start() {
         // recorrer la planificacion
         // para cada jornada
-        for(const matchDay of this.matchDaySchedule) {
+        for (const matchDay of this.matchDaySchedule) {
             // sirve para almacenar la información de los resultados de la jornada y generar su clasificación
             const matchDaySummary = {
-                results: [], // array de resultados
-                standings: undefined // clasificación al terminar la jornada
-            }
-            // para cada partido de la jornada
-            for(const match of matchDay) { 
+                    results: [], // array de resultados
+                    standings: undefined // clasificación al terminar la jornada
+                }
+                // para cada partido de la jornada
+            for (const match of matchDay) {
                 // jugar el partido
-                if(match.home === null || match.away === null) {
+                if (match.home === null || match.away === null) {
                     // saltamos el partido porque el equipo descansa
                     continue;
                 }
@@ -54,13 +37,24 @@ export default class League {
                 matchDaySummary.results.push(result)
             }
             // TODO  generar la tabla de clasificacion al finalizar la jornada
-            matchDaySummary.standings = this.getStandings().map(team => Object.assign({}, team))
-            // guardar el resumen de la jornada en el array de resumenes
+            matchDaySummary.standings = this.getStandings().map(
+                    (team) => {
+                        let teamClone = ({...team });
+
+                        return {
+                            'Equipo': teamClone.name,
+                            'Puntos': teamClone.teamConfig.points,
+                            'Goles a favor': teamClone.teamConfig.goalsInFavor,
+                            'Goles en contra': teamClone.teamConfig.goalsAgainst,
+                            'Diferencia goles': teamClone.teamConfig.goalsDifference
+                        };
+                    })
+                // guardar el resumen de la jornada en el array de resumenes
             this.summaries.push(matchDaySummary);
         }
     }
 
-    play(match){
+    play(match) {
         throw new Error('Play method must be implemented at child class')
     }
 
@@ -81,19 +75,30 @@ export default class League {
 
         return round;
     }
-    
+
     // DONE: Crear la planificación de jornadas y partidos de cada jornada.
-    scheduleMatchDays(){
-        for(let i = 0; i < this.config.rounds; i++) {
+    scheduleMatchDays() {
+        for (let i = 0; i < this.config.rounds; i++) {
             const round = this.createRound();
             // si la jornada es impar, giramos los partidos
-            if(i % 2 === 1) {
+            if (i % 2 === 1) {
                 this.swapTeamsWithinMatches(round);
             }
             this.matchDaySchedule = this.matchDaySchedule.concat(round)
         }
-        
     }
+
+
+    swapTeamsWithinMatches(round) {
+        for (const matchDay of round) {
+            for (const match of matchDay) {
+                const localTeam = match.home;
+                match.home = match.away;
+                match.away = localTeam;
+            }
+        }
+    }
+
 
     getTeamNames() {
         return this.teams.map(team => team.name)
@@ -119,11 +124,11 @@ export default class League {
         for (let i = 0; i < numberOfMatchDays; i++) {
             // jornada vacía
             const matchDay = []
-            // recorremos todos los partidos de una jornada
+                // recorremos todos los partidos de una jornada
             for (let j = 0; j < numberOfMatchesPerMatchDay; j++) {
                 // generamos un template de partido: match
                 let match = { home: 'home', away: 'away' }
-                // llenamos la jornada (matchDay) de partidos
+                    // llenamos la jornada (matchDay) de partidos
                 matchDay.push(match);
             }
             // jornada llena, la ponemos en la planificación
@@ -134,7 +139,7 @@ export default class League {
     setLocalTeams(round) {
         const teamNames = this.getTeamNamesForSchedule(); // teamNames = ['A', 'B', 'C', 'D'] posiciones: 0,1,2,3
         let teamIndex = 0;
-        const teamIndexMaxValue = teamNames.length - 1 - 1;  // teamNames.length === 4
+        const teamIndexMaxValue = teamNames.length - 1 - 1; // teamNames.length === 4
         round.forEach(matchDay => {
             matchDay.forEach(match => {
                 // asignamos al equipo local el equipo correspondiente
@@ -152,7 +157,7 @@ export default class League {
         const maxAwayTeams = teamNames.length - 1; // ultima posicion del array
         let teamIndex = maxAwayTeams - 1; // penultima posicion del array = ultimaPos - 1
         round.forEach(matchDay => {
-            matchDay.forEach(function (match, matchIndex) {
+            matchDay.forEach(function(match, matchIndex) {
                 // los arrays empiezan las posiciones en 0
                 if (matchIndex === 0) {
                     match.away = teamNames[maxAwayTeams]
@@ -174,9 +179,9 @@ export default class League {
             if (matchDayIndex % 2 === 1) {
                 // ej: {home: 'D', away: 'F'} => {home: 'F', away: 'D'}
                 const firstMatch = matchDay[0]; // primer partido de la jornada
-                const temp = firstMatch.home;   // temp = 'D'
+                const temp = firstMatch.home; // temp = 'D'
                 firstMatch.home = firstMatch.away; // firstMatch.home = 'F' => {home: 'F', away:'F'}
-                firstMatch.away = temp;     // firstMatch.away = temp = 'D' => {home: 'F', away: 'D'}
+                firstMatch.away = temp; // firstMatch.away = temp = 'D' => {home: 'F', away: 'D'}
             }
         })
     }
