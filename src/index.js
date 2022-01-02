@@ -1,12 +1,8 @@
 import { FootBallTeam } from "./classes/FootBallTeam.js";
 import { FootBallWorldCup } from "./classes/FootballWorldCup.js";
-import FootballLeague from "./classes/FootballLeague.js";
 import { setupArrays } from "./utils/index.js";
 //DONE: El programa comenzará indicando con un mensaje que “comienza el torneo”.
-console.log(`===============================================
-===== COMIENZO DE LA FASE DE ELIMINATORIAS ====
-===============================================
-`);
+
 const WORLD_CUP_TEAMS = [
     new FootBallTeam('Brasil'),
     new FootBallTeam('Ecuador'),
@@ -41,92 +37,99 @@ const WORLD_CUP_TEAMS = [
     new FootBallTeam('Bolivia'),
     new FootBallTeam('Noruega')
 ];
+const GROUP_NAMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
 //****************** PARTE OPCIONAL FASE DE GRUPOS (TODO: CUANDO FUNCIONE ACOPLARLO CON LOS PLAYOFFS) ***********************/
 setupArrays();
-groupsPhase();
+WORLD_CUP_TEAMS.shuffle();
 
+const MUNDIAL = new FootBallWorldCup(WORLD_CUP_TEAMS, GROUP_NAMES);
+playGroupsPhase();
 //****************** PROGRAMA MINIMO PLAYOFFS ***********************/
-// executePlayOffs();
+executePlayOffs();
 
-function groupsPhase() {
-    const MAX_TEAMS_IN_GROUP = 4;
-    const GROUP_NAMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-    let groupNameIndex = 0;
-    const GROUP_LEAGUES = [];
-    WORLD_CUP_TEAMS.shuffle();
-
-    for (let i = WORLD_CUP_TEAMS.length - 1; i >= 0; i -= MAX_TEAMS_IN_GROUP) {
-        GROUP_LEAGUES.push(new FootballLeague(`GRUPO ${GROUP_NAMES[groupNameIndex]}`, WORLD_CUP_TEAMS.splice(0, MAX_TEAMS_IN_GROUP), { rounds: 1 }))
-        groupNameIndex++;
-    }
-
-    console.log(GROUP_LEAGUES.map(e => e.teams));
-
-    GROUP_LEAGUES.forEach(groupLeague => {
-        playEachGroupLeague(groupLeague);
-    });
-
+function playGroupsPhase() {
+    playEachGroupLeague(MUNDIAL.groupsPhase);
+    MUNDIAL.setRemainingTeamsFromGroups();
 }
 
-function playEachGroupLeague(footballLeague) {
-    footballLeague.scheduleMatchDays();
+function playEachGroupLeague(groupsPhase) {
+    console.log(`Grupos y equipos
+===============================
+    `);
     // DONE: Mostrar los equipos inscritos por pantalla.
-    const teamNames = footballLeague.getTeamNames();
-
-    teamNames.forEach(function(team) {
-        console.log(team);
-    });
-
-    // DONE: Mostrar la planificación por pantalla.
-    footballLeague.matchDaySchedule.forEach((matchDay, matchDayIndex) => {
-        console.log(`JORNADA ${matchDayIndex + 1}`);
-        matchDay.forEach(match => {
-
-            if (match.home === null || match.away === null) {
-                const teamName = match.home || match.away;
-                console.log(`${teamName} DESCANSA`);
-            } else {
-                console.log(`${match.home} vs ${match.away}`);
-            }
-
+    groupsPhase.forEach((footballLeague) => {
+        const teamNames = footballLeague.getTeamNames();
+        console.log(`${footballLeague.name}
+-----------------------`);
+        teamNames.forEach(function(team) {
+            console.log(team);
         });
-        console.log('=======================');
-    });
-    // DONE: Jugar los partidos de todas las jornadas. 
-    footballLeague.start();
-    // Una vez terminada cada jornada, se deberá mostrar cómo queda la clasificación de la misma.
-    footballLeague.summaries.forEach((summary, matchDayIndex) => {
-        console.log(`Resultados de la jornada ${matchDayIndex + 1}`);
-        summary.results.forEach((result) => {
-            console.log(`${result.homeTeamName} ${result.homeGoals} - ${result.awayGoals} ${result.awayTeamName}`);
-        });
-        console.table(summary.standings);
         console.log('\n');
+
+        // DONE: Mostrar la planificación por pantalla.
+        footballLeague.scheduleMatchDays();
+
+        footballLeague.matchDaySchedule.forEach((matchDay, matchDayIndex) => {
+            console.log(`Jornada ${matchDayIndex + 1}:`);
+            matchDay.forEach(match => {
+
+                if (match.home === null || match.away === null) {
+                    const teamName = match.home || match.away;
+                    console.log(`- ${teamName} DESCANSA`);
+                } else {
+                    console.log(`- ${match.home} vs ${match.away}`);
+                }
+
+            });
+            console.log('\n');
+        });
     });
 
-    // DONE: Una vez terminada la liga, se mostrarán estadísticas de número de goles totales y total de puntos ganados.
-    const totalGoals = footballLeague.teams.reduce((accumulated, team) => {
-        return accumulated + team.teamConfig.goalsInFavor;
-    }, 0);
+    console.log(`
+===============================================
+============== COMIENZA EL MUNDIAL ============
+===============================================
+    `);
 
-    const totalPoints = footballLeague.teams.reduce((accumulated, team) => accumulated + team.teamConfig.points, 0);
+    const GROUPS_RESULTS = groupsPhase.map((footballLeague) => {
+            // DONE: Jugar los partidos de todas las jornadas. 
+            footballLeague.start();
+            return {
+                groupName: footballLeague.name,
+                matchDaySchedule: footballLeague.matchDaySchedule,
+                summaries: footballLeague.summaries
+            }
+        })
+        .reduce((acc, currentLeague) => {
+            acc.firstDayMatches.push({ groupName: currentLeague.groupName, summaries: currentLeague.summaries[0] });
+            acc.secondDayMatches.push({ groupName: currentLeague.groupName, summaries: currentLeague.summaries[1] });
+            acc.thirdDayMatches.push({ groupName: currentLeague.groupName, summaries: currentLeague.summaries[2] });
+            return acc;
+        }, { firstDayMatches: [], secondDayMatches: [], thirdDayMatches: [] });
 
-    console.log(`Total goals are ${totalGoals}`);
-    console.log(`Total points are ${totalPoints}`);
+    Object.values(GROUPS_RESULTS).forEach((matchDay, index) => {
+        matchDay.forEach((match) => {
+            console.log(`${match.groupName} - Jornada ${index +1}:`);
+            console.log(`----------------------------`);
+            match.summaries.results.forEach((result) => {
+                console.log(`${result.homeTeamName} ${result.homeGoals} - ${result.awayGoals} ${result.awayTeamName}`);
+            });
+            console.table(match.summaries.standings);
+            console.log('\n');
+        })
 
-    const initialMetrics = { totalGoals: 0, totalPoints: 0 };
-    const finalMetrics = footballLeague.teams.reduce((acc, curr) => {
-        acc.totalGoals += curr.teamConfig.goalsInFavor;
-        acc.totalPoints += curr.teamConfig.points;
-        return acc;
-    }, initialMetrics);
+    });
 
-    console.table(finalMetrics);
 }
 
 function executePlayOffs() {
-    console.log('****************** PROGRAMA MINIMO PLAYOFFS ***********************');
-    const MUNDIAL = new FootBallWorldCup(WORLD_CUP_TEAMS);
+    // console.log('****************** PROGRAMA MINIMO PLAYOFFS ***********************');
+    console.log(`===============================================
+===== COMIENZO DE LA FASE DE ELIMINATORIAS ====
+===============================================
+`);
+    // const MUNDIAL = new FootBallWorldCup(WORLD_CUP_TEAMS);
 
     //DONE:   El programa deberá mostrar los 16 equipos participantes en la fase de eliminatorias (play off).
     console.log(`Equipos que van a participar en el playoff: ${MUNDIAL.teams.map(team => team.name)}`);
@@ -140,7 +143,7 @@ function executePlayOffs() {
         teams = MUNDIAL.playCuartos(teams.winningTeams);
         const TEAMS_AFTER_SEMIFINALS = MUNDIAL.playSemis(teams.winningTeams);
         MUNDIAL.playForThirdAndFourthPlace(TEAMS_AFTER_SEMIFINALS.losingTeams);
-        //TODO:  Opcional: Una vez finalizadas las semifinales, se mostrará el resultado del partido de
+        //DONE:  Opcional: Una vez finalizadas las semifinales, se mostrará el resultado del partido de
         // tercer y cuarto puesto (que se juega entre equipos no clasificados para la final).
         teams = MUNDIAL.playFinals(TEAMS_AFTER_SEMIFINALS.winningTeams);
         printWorldChampion(teams.winningTeams);

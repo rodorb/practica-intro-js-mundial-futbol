@@ -1,30 +1,87 @@
 'use strict';
+import FootballLeague from "./FootballLeague.js";
+
 export class FootBallWorldCup {
-    constructor(teams) {
-        this.teams = this.setPlayOffTeamsRandomly(teams);
+    constructor(teams, groupNames) {
+        // this.teams = this.setPlayOffTeamsRandomly(teams);
+        this.teams = teams;
+        this.groupsPhase = this.assignTeamsToGroups(groupNames);
     }
 
-    setPlayOffTeamsRandomly(teams) {
-        const REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS = 16;
-        let playOffsTeamsAux = [];
-        try {
-            if (teams.length > REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
-                while (playOffsTeamsAux.length < REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
-                    playOffsTeamsAux = playOffsTeamsAux.concat(teams.splice(Math.floor(Math.random() * (teams.length - 1)), 1));
-                }
-            } else if (teams.length < REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
-                console.log('THERE SHOULD BE AT LEAST 16 TEAMS');
-                return;
-            } else {
-                return teams;
-            }
-        } catch (error) {
-            console.error(error);
-            return;
+    assignTeamsToGroups(groupNames) {
+        const MAX_TEAMS_IN_GROUP = 4;
+
+        let groupNameIndex = 0;
+        const GROUP_LEAGUES = [];
+        const WORLD_CUP_TEAMS = [...this.teams]
+            // WORLD_CUP_TEAMS.shuffle();
+
+        for (let i = WORLD_CUP_TEAMS.length - 1; i >= 0; i -= MAX_TEAMS_IN_GROUP) {
+            GROUP_LEAGUES.push(new FootballLeague(`Grupo ${groupNames[groupNameIndex]}`, WORLD_CUP_TEAMS.splice(0, MAX_TEAMS_IN_GROUP), { rounds: 1 }));
+            groupNameIndex++;
         }
-        return playOffsTeamsAux;
-
+        return GROUP_LEAGUES;
     }
+
+    setRemainingTeamsFromGroups() {
+        const GROUPS_PHASE_RESULTS = this.groupsPhase.map((e) => {
+            return {
+                groupName: e.name,
+                lastSummary: e.summaries[e.summaries.length - 1].standings,
+                teams: e.teams
+            }
+        });
+        // GROUPS_PHASE_RESULTS.forEach((result) => {
+        //     const FIRST_TEAMS_NAMES = result.lastSummary.map(item => item['Equipo']).slice(0, 2);
+        //     FIRST_TEAMS_NAMES.forEach((teamName) => {
+        //         REMAINING_TEAMS.push(result.teams.find(team => team.name === teamName));
+        //     })
+        // });
+
+        const GROUPS_AND_TEAMS = GROUPS_PHASE_RESULTS.reduce((acc, result) => {
+            const FIRST_TEAMS_NAMES = result.lastSummary.map(item => item['Equipo']).slice(0, 2);
+            acc[result.groupName.split(' ')[1]] = FIRST_TEAMS_NAMES.map((teamName) => {
+                return result.teams.find(team => team.name === teamName)
+            });
+            return acc;
+        }, {});
+
+        //TODO: Revisar refactorizacion de esto.......
+        const REMAINING_TEAMS = [
+            GROUPS_AND_TEAMS['A'][0], GROUPS_AND_TEAMS['B'][1],
+            GROUPS_AND_TEAMS['C'][0], GROUPS_AND_TEAMS['D'][1],
+            GROUPS_AND_TEAMS['B'][0], GROUPS_AND_TEAMS['A'][1],
+            GROUPS_AND_TEAMS['D'][0], GROUPS_AND_TEAMS['C'][1],
+            GROUPS_AND_TEAMS['E'][0], GROUPS_AND_TEAMS['F'][1],
+            GROUPS_AND_TEAMS['G'][0], GROUPS_AND_TEAMS['H'][1],
+            GROUPS_AND_TEAMS['F'][0], GROUPS_AND_TEAMS['E'][1],
+            GROUPS_AND_TEAMS['H'][0], GROUPS_AND_TEAMS['G'][1],
+        ];
+        this.teams = REMAINING_TEAMS;
+    }
+
+
+    // setPlayOffTeamsRandomly(teams) {
+    //     const REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS = 16;
+    //     let playOffsTeamsAux = [];
+    //     try {
+    //         if (teams.length > REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
+    //             while (playOffsTeamsAux.length < REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
+    //                 playOffsTeamsAux = playOffsTeamsAux.concat(teams.splice(Math.floor(Math.random() * (teams.length - 1)), 1));
+    //             }
+    //         } else if (teams.length < REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
+    //             console.log('THERE SHOULD BE AT LEAST 16 TEAMS');
+    //             return;
+    //         } else {
+    //             return teams;
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //         return;
+    //     }
+    //     return playOffsTeamsAux;
+
+    // }
 
 
 
@@ -47,9 +104,9 @@ export class FootBallWorldCup {
     }
 
 
-    playForThirdAndFourthPlace(teams){
+    playForThirdAndFourthPlace(teams) {
         const MATCHES_PLAYED = this.playScheduledRound(teams, 'TERCER Y CUARTO PUESTO');
-        this.printMatchesResults(MATCHES_PLAYED); 
+        this.printMatchesResults(MATCHES_PLAYED);
     }
 
 
@@ -59,7 +116,7 @@ export class FootBallWorldCup {
         return { winningTeams: this.setRemainingTeams(MATCHES_PLAYED) };
     }
 
-    playScheduledRound(teams, roundName, randomizeOrder = false) {
+    playScheduledRound(teams, roundName /*, randomizeOrder = false*/ ) {
         console.log(`
 ===== ${roundName} =====
         `);
@@ -71,16 +128,16 @@ export class FootBallWorldCup {
             for (let j = TEAMS_CLONE.length - 1; j >= 0; j -= 2) {
                 let FIRST_RANDOM_TEAM;
                 let SECOND_RANDOM_TEAM;
-                if (randomizeOrder) {
-                    FIRST_RANDOM_TEAM = TEAMS_CLONE.splice(Math.floor(Math.random() * (TEAMS_CLONE.length - 1)), 1);
-                    SECOND_RANDOM_TEAM = TEAMS_CLONE.splice(Math.floor(Math.random() * (TEAMS_CLONE.length - 1)), 1);
+                // if (randomizeOrder) {
+                //     FIRST_RANDOM_TEAM = TEAMS_CLONE.splice(Math.floor(Math.random() * (TEAMS_CLONE.length - 1)), 1);
+                //     SECOND_RANDOM_TEAM = TEAMS_CLONE.splice(Math.floor(Math.random() * (TEAMS_CLONE.length - 1)), 1);
 
-                } else {
-                    FIRST_RANDOM_TEAM = TEAMS_CLONE.splice(j[0], 1);
-                    SECOND_RANDOM_TEAM = TEAMS_CLONE.splice(j[1], 1);
-                }
+                // } else {
+                FIRST_RANDOM_TEAM = TEAMS_CLONE.splice(0, 1);
+                SECOND_RANDOM_TEAM = TEAMS_CLONE.splice(0, 1);
+                // }
                 this.playMatch(...FIRST_RANDOM_TEAM, ...SECOND_RANDOM_TEAM, () => { return Math.ceil(Math.random() * MAX_NUMBER_OF_GOALS_IN_HISTORY); });
-                MATCHES_PLAYED.push({ firstTeam: { ...FIRST_RANDOM_TEAM[0] }, secondTeam: { ...SECOND_RANDOM_TEAM[0] } });
+                MATCHES_PLAYED.push({ firstTeam: {...FIRST_RANDOM_TEAM[0] }, secondTeam: {...SECOND_RANDOM_TEAM[0] } });
             }
         }
         return MATCHES_PLAYED;

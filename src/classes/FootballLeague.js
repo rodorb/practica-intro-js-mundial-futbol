@@ -45,20 +45,14 @@ export default class FootballLeague extends League {
             // gana el local
             homeTeam.teamConfig.points += this.config.pointsPerWin;
             awayTeam.teamConfig.points += this.config.pointsPerLose;
-            homeTeam.teamConfig.matchesWon++;
-            awayTeam.teamConfig.matchesLost++;
         } else if (result.homeGoals < result.awayGoals) {
             // gana el visitante
             awayTeam.teamConfig.points += this.config.pointsPerWin;
             homeTeam.teamConfig.points += this.config.pointsPerLose;
-            awayTeam.teamConfig.matchesWon++;
-            homeTeam.teamConfig.matchesLost++;
         } else {
             // empatan
             awayTeam.teamConfig.points += this.config.pointsPerDraw;
             homeTeam.teamConfig.points += this.config.pointsPerDraw;
-            awayTeam.teamConfig.matchesDraw++;
-            homeTeam.teamConfig.matchesDraw++;
         }
 
     }
@@ -71,21 +65,30 @@ export default class FootballLeague extends League {
         const teams = [...this.teams];
         return teams.sort(function(teamA, teamB) {
             // -1 0 1
+            //orden por puntos
             if (teamA.teamConfig.points > teamB.teamConfig.points) {
-                return -1
+                return -1;
             } else if (teamA.teamConfig.points < teamB.teamConfig.points) {
-                return 1
+                return 1;
             } else {
-                const goalsDiffA = teamA.teamConfig.goalsInFavor - teamA.teamConfig.goalsAgainst;
-                const goalsDiffB = teamB.teamConfig.goalsInFavor - teamB.teamConfig.goalsAgainst;
+                //orden por diferencia de goles
+                const goalsDiffA = teamA.teamConfig.goalsDifference;
+                const goalsDiffB = teamB.teamConfig.goalsDifference;
 
                 if (goalsDiffA > goalsDiffB) {
-                    return -1
+                    return -1;
                 } else if (goalsDiffA < goalsDiffB) {
-                    return 1
+                    return 1;
                 } else {
-                    // más criterios de evaluacion en caso de empate
-                    return 0
+
+                    //Orden alfabético
+                    if (teamA.name > teamB.name) {
+                        return -1;
+                    } else if (teamA.name < teamB.name) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
                 }
             }
         })
