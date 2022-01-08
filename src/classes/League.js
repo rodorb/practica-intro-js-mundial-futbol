@@ -36,7 +36,7 @@ export default class League {
                 // almacenamos el resultado de la jornada
                 matchDaySummary.results.push(result)
             }
-            // TODO  generar la tabla de clasificacion al finalizar la jornada
+            // DONE  generar la tabla de clasificacion al finalizar la jornada
             matchDaySummary.standings = this.getStandings().map(
                     (team) => {
                         let teamClone = ({...team });

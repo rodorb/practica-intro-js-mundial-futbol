@@ -1,5 +1,5 @@
 import League from "./League.js";
-
+import { generateGoals } from '../utils/index.js'
 export default class FootballLeague extends League {
     constructor(name, teams, config = {}) {
         super(name, teams, config)
@@ -16,8 +16,8 @@ export default class FootballLeague extends League {
     }
 
     play(match) {
-        const homeGoals = this.generateGoals();
-        const awayGoals = this.generateGoals();
+        const homeGoals = generateGoals(10);
+        const awayGoals = generateGoals(10);
 
         return {
             homeTeamName: match.home,
@@ -57,9 +57,7 @@ export default class FootballLeague extends League {
 
     }
 
-    generateGoals() {
-        return Math.floor(Math.random() * 10);
-    }
+
 
     getStandings() {
         const teams = [...this.teams];

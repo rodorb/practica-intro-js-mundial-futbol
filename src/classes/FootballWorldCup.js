@@ -1,11 +1,12 @@
 'use strict';
 import FootballLeague from "./FootballLeague.js";
+import { generateGoals, mergeTwoArrays } from '../utils/index.js'
 
 export class FootBallWorldCup {
     constructor(teams, groupNames) {
         // this.teams = this.setPlayOffTeamsRandomly(teams);
         this.teams = teams;
-        this.groupsPhase = this.assignTeamsToGroups(groupNames);
+        this.groupsPhase = this.assignTeamsToGroups(groupNames); //array de ligas de futbol (por cada grupo se juega una liga de futbol)
     }
 
     assignTeamsToGroups(groupNames) {
@@ -31,12 +32,6 @@ export class FootBallWorldCup {
                 teams: e.teams
             }
         });
-        // GROUPS_PHASE_RESULTS.forEach((result) => {
-        //     const FIRST_TEAMS_NAMES = result.lastSummary.map(item => item['Equipo']).slice(0, 2);
-        //     FIRST_TEAMS_NAMES.forEach((teamName) => {
-        //         REMAINING_TEAMS.push(result.teams.find(team => team.name === teamName));
-        //     })
-        // });
 
         const GROUPS_AND_TEAMS = GROUPS_PHASE_RESULTS.reduce((acc, result) => {
             const FIRST_TEAMS_NAMES = result.lastSummary.map(item => item['Equipo']).slice(0, 2);
@@ -46,18 +41,31 @@ export class FootBallWorldCup {
             return acc;
         }, {});
 
+        const FIRST_ARRAY_TEAMS = Object.values(GROUPS_AND_TEAMS).reduce((acc, team, index) => {
+            if (index % 2 === 0) { acc.push(team[0]) } else { acc.push(team[1]) }
+            return acc;
+        }, []).toMatriz(4);
+
+        const SECOND_ARRAY_TEAMS = Object.values(GROUPS_AND_TEAMS).reverse().reduce((acc, team, index, arr) => {
+            if (index % 2 === 0) { acc.push([team[0], arr[index + 1][1]]) }
+            return acc;
+        }, []).reverse().flat().toMatriz(4);
+
+
+        const REMAINING_TEAMS_V2 = mergeTwoArrays(FIRST_ARRAY_TEAMS, SECOND_ARRAY_TEAMS);
+
         //TODO: Revisar refactorizacion de esto.......
-        const REMAINING_TEAMS = [
-            GROUPS_AND_TEAMS['A'][0], GROUPS_AND_TEAMS['B'][1],
-            GROUPS_AND_TEAMS['C'][0], GROUPS_AND_TEAMS['D'][1],
-            GROUPS_AND_TEAMS['B'][0], GROUPS_AND_TEAMS['A'][1],
-            GROUPS_AND_TEAMS['D'][0], GROUPS_AND_TEAMS['C'][1],
-            GROUPS_AND_TEAMS['E'][0], GROUPS_AND_TEAMS['F'][1],
-            GROUPS_AND_TEAMS['G'][0], GROUPS_AND_TEAMS['H'][1],
-            GROUPS_AND_TEAMS['F'][0], GROUPS_AND_TEAMS['E'][1],
-            GROUPS_AND_TEAMS['H'][0], GROUPS_AND_TEAMS['G'][1],
-        ];
-        this.teams = REMAINING_TEAMS;
+        // const REMAINING_TEAMS = [
+        //     GROUPS_AND_TEAMS['A'][0], GROUPS_AND_TEAMS['B'][1],
+        //     GROUPS_AND_TEAMS['C'][0], GROUPS_AND_TEAMS['D'][1],
+        //     GROUPS_AND_TEAMS['B'][0], GROUPS_AND_TEAMS['A'][1],
+        //     GROUPS_AND_TEAMS['D'][0], GROUPS_AND_TEAMS['C'][1],
+        //     GROUPS_AND_TEAMS['E'][0], GROUPS_AND_TEAMS['F'][1],
+        //     GROUPS_AND_TEAMS['G'][0], GROUPS_AND_TEAMS['H'][1],
+        //     GROUPS_AND_TEAMS['F'][0], GROUPS_AND_TEAMS['E'][1],
+        //     GROUPS_AND_TEAMS['H'][0], GROUPS_AND_TEAMS['G'][1],
+        // ];
+        this.teams = REMAINING_TEAMS_V2;
     }
 
 
@@ -116,40 +124,32 @@ export class FootBallWorldCup {
         return { winningTeams: this.setRemainingTeams(MATCHES_PLAYED) };
     }
 
-    playScheduledRound(teams, roundName /*, randomizeOrder = false*/ ) {
+    playScheduledRound(teams, roundName) {
         console.log(`
 ===== ${roundName} =====
         `);
         const NUMBER_OF_MATCHES = teams.length / 2;
         const MATCHES_PLAYED = [];
         const TEAMS_CLONE = [...teams];
-        const MAX_NUMBER_OF_GOALS_IN_HISTORY = 31;
         for (let i = 0; i < NUMBER_OF_MATCHES; i++) {
             for (let j = TEAMS_CLONE.length - 1; j >= 0; j -= 2) {
-                let FIRST_RANDOM_TEAM;
-                let SECOND_RANDOM_TEAM;
-                // if (randomizeOrder) {
-                //     FIRST_RANDOM_TEAM = TEAMS_CLONE.splice(Math.floor(Math.random() * (TEAMS_CLONE.length - 1)), 1);
-                //     SECOND_RANDOM_TEAM = TEAMS_CLONE.splice(Math.floor(Math.random() * (TEAMS_CLONE.length - 1)), 1);
+                const FIRST_TEAM = TEAMS_CLONE.splice(0, 1);
+                const SECOND_TEAM = TEAMS_CLONE.splice(0, 1);
 
-                // } else {
-                FIRST_RANDOM_TEAM = TEAMS_CLONE.splice(0, 1);
-                SECOND_RANDOM_TEAM = TEAMS_CLONE.splice(0, 1);
-                // }
-                this.playMatch(...FIRST_RANDOM_TEAM, ...SECOND_RANDOM_TEAM, () => { return Math.ceil(Math.random() * MAX_NUMBER_OF_GOALS_IN_HISTORY); });
-                MATCHES_PLAYED.push({ firstTeam: {...FIRST_RANDOM_TEAM[0] }, secondTeam: {...SECOND_RANDOM_TEAM[0] } });
+                this.playMatch(...FIRST_TEAM, ...SECOND_TEAM);
+                MATCHES_PLAYED.push({ firstTeam: {...FIRST_TEAM[0] }, secondTeam: {...SECOND_TEAM[0] } });
             }
         }
         return MATCHES_PLAYED;
     }
 
-    playMatch(firstTeam, secondTeam, randomizeGoalsFunction) {
-        firstTeam.teamConfig.currentMatchGoals = randomizeGoalsFunction();
-        secondTeam.teamConfig.currentMatchGoals = randomizeGoalsFunction();
+    playMatch(firstTeam, secondTeam) {
+        firstTeam.teamConfig.currentMatchGoals = generateGoals(10);
+        secondTeam.teamConfig.currentMatchGoals = generateGoals(10);
 
         if (firstTeam.teamConfig.currentMatchGoals === secondTeam.teamConfig.currentMatchGoals) {
             //si empatan se vuelve a jugar el partido hasta que no haya empate en goles
-            this.playMatch(firstTeam, secondTeam, randomizeGoalsFunction)
+            this.playMatch(firstTeam, secondTeam)
         } else {
             //se aculuman los goles a favor y en contra (esto igual no hace falta en los playoffs pero para tenerlo
             // por si me da por hacer la fase de grupos)
