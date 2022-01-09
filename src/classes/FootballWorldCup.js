@@ -53,44 +53,8 @@ export class FootBallWorldCup {
 
 
         const REMAINING_TEAMS_V2 = mergeTwoArrays(FIRST_ARRAY_TEAMS, SECOND_ARRAY_TEAMS);
-
-        //TODO: Revisar refactorizacion de esto.......
-        // const REMAINING_TEAMS = [
-        //     GROUPS_AND_TEAMS['A'][0], GROUPS_AND_TEAMS['B'][1],
-        //     GROUPS_AND_TEAMS['C'][0], GROUPS_AND_TEAMS['D'][1],
-        //     GROUPS_AND_TEAMS['B'][0], GROUPS_AND_TEAMS['A'][1],
-        //     GROUPS_AND_TEAMS['D'][0], GROUPS_AND_TEAMS['C'][1],
-        //     GROUPS_AND_TEAMS['E'][0], GROUPS_AND_TEAMS['F'][1],
-        //     GROUPS_AND_TEAMS['G'][0], GROUPS_AND_TEAMS['H'][1],
-        //     GROUPS_AND_TEAMS['F'][0], GROUPS_AND_TEAMS['E'][1],
-        //     GROUPS_AND_TEAMS['H'][0], GROUPS_AND_TEAMS['G'][1],
-        // ];
         this.teams = REMAINING_TEAMS_V2;
     }
-
-
-    // setPlayOffTeamsRandomly(teams) {
-    //     const REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS = 16;
-    //     let playOffsTeamsAux = [];
-    //     try {
-    //         if (teams.length > REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
-    //             while (playOffsTeamsAux.length < REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
-    //                 playOffsTeamsAux = playOffsTeamsAux.concat(teams.splice(Math.floor(Math.random() * (teams.length - 1)), 1));
-    //             }
-    //         } else if (teams.length < REQUIRED_NUMBER_OF_PLAYOFFS_TEAMS) {
-    //             console.log('THERE SHOULD BE AT LEAST 16 TEAMS');
-    //             return;
-    //         } else {
-    //             return teams;
-    //         }
-    //     } catch (error) {
-    //         console.error(error);
-    //         return;
-    //     }
-    //     return playOffsTeamsAux;
-
-    // }
-
 
 
     playOctavos(teams) {
